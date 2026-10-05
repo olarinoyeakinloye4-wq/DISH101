@@ -1,0 +1,23 @@
+# Dependencies and generated output
+node_modules/
+dist/
+build/
+.netlify/
+coverage/
+*.tsbuildinfo
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Operating system and editors
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+*.swp
+*.swo

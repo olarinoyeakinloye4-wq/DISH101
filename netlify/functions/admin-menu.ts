@@ -1,0 +1,11 @@
+import type { Handler } from '@netlify/functions';
+import { z } from 'zod';
+import { error,json,options,rateLimit } from './_shared/http.js';
+import { clean,requireAdmin } from './_shared/security.js';
+import { supabase } from './_shared/supabase.js';
+const itemSchema=z.object({name:z.string().min(2).max(100).transform(clean),description:z.string().min(2).max(350).transform(clean),price:z.number().int().min(1).max(10_000_000),category:z.string().min(2).max(40).transform(clean),image:z.string().min(1).max(500).transform(clean),badge:z.string().max(30).transform(clean).nullable().optional(),available:z.boolean().optional()});
+export const handler:Handler = async event => {if(event.httpMethod==='OPTIONS')return options(event);if(!rateLimit(event,60))return error(event,429,'RATE_LIMITED','Too many requests.');const auth=await requireAdmin(event);if('response' in auth && auth.response)return auth.response;const db=supabase();
+  try {if(event.httpMethod==='POST'){const parsed=itemSchema.safeParse(JSON.parse(event.body||'{}'));if(!parsed.success)return error(event,400,'INVALID_MENU_ITEM',parsed.error.issues[0]?.message||'Invalid item.');const {data,error:dbError}=await db.from('menu_items').insert(parsed.data).select().single();if(dbError)throw dbError;return json(event,201,{data});}
+    if(event.httpMethod==='PUT'){const parsed=z.object({id:z.string().uuid(),item:itemSchema}).safeParse(JSON.parse(event.body||'{}'));if(!parsed.success)return error(event,400,'INVALID_MENU_ITEM',parsed.error.issues[0]?.message||'Invalid item.');const {data,error:dbError}=await db.from('menu_items').update(parsed.data.item).eq('id',parsed.data.id).select().single();if(dbError)throw dbError;return json(event,200,{data});}
+    if(event.httpMethod==='DELETE'){const parsed=z.object({id:z.string().uuid()}).safeParse(JSON.parse(event.body||'{}'));if(!parsed.success)return error(event,400,'INVALID_MENU_ITEM','A valid item id is required.');const {error:dbError}=await db.from('menu_items').delete().eq('id',parsed.data.id);if(dbError)throw dbError;return json(event,204,{});}return error(event,405,'METHOD_NOT_ALLOWED','Use POST, PUT, or DELETE.');
+  }catch(cause){console.error('admin menu:',cause);return error(event,500,'MENU_UPDATE_FAILED','Unable to update menu.');}};

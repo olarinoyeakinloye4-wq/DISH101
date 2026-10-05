@@ -1,0 +1,36 @@
+{
+  "name": "dish101",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Nigerian restaurant ordering website with Paystack, Supabase, and Netlify Functions.",
+  "scripts": {
+    "dev": "netlify dev --port 8888",
+    "build": "tsc --noEmit",
+    "lint": "tsc --noEmit",
+    "typecheck": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/olarinoyeakinloye4-wq/DISH101.git"
+  },
+  "keywords": [
+    "restaurant",
+    "nigerian-food",
+    "online-ordering",
+    "netlify",
+    "supabase",
+    "paystack",
+    "typescript",
+    "vanilla-javascript"
+  ],
+  "dependencies": {
+    "@netlify/functions": "^2.8.2",
+    "@supabase/supabase-js": "^2.49.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.5",
+    "netlify-cli": "^17.38.1",
+    "typescript": "^5.7.3"
+  }
+}
